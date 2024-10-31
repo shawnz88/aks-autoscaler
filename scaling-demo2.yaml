@@ -1,7 +1,7 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: store-front-hpa
+  name: demo-hpa
 spec:
   maxReplicas: 10 # define max replica count
   minReplicas: 1  # define min replica count
