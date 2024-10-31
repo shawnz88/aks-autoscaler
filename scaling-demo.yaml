@@ -1,3 +1,22 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: store-front-hpa
+spec:
+  maxReplicas: 10 # define max replica count
+  minReplicas: 1  # define min replica count
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: demo
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+        
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,7 +25,7 @@ metadata:
   name: demo
   namespace: scaling-demo
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: scaling-demo
