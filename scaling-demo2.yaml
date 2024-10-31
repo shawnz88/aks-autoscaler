@@ -1,50 +1,45 @@
----       
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: scaling-demo
-  name: demo
+  name: php-apache
   namespace: scaling-demo
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: scaling-demo
+      run: php-apache
   template:
     metadata:
       labels:
-        app: scaling-demo
+        run: php-apache
     spec:
       containers:
-      - image: thorstenhans/aks-scaling-demo:0.0.1
-        name: aks-auto-scaler-demo
-        readinessProbe:
-          httpGet:
-            path: /status/ready
-            port: 80
-          initialDelaySeconds: 3
-          periodSeconds: 3
-        livenessProbe:
-          httpGet:
-            path: /status/health
-            port: 80
-          initialDelaySeconds: 10
-          periodSeconds: 1
+      - name: php-apache
+        image: registry.k8s.io/hpa-example
         ports:
         - containerPort: 80
         resources:
           limits:
             cpu: 1500m
-            memory: 1000Mi
           requests:
             cpu: 1000m
-            memory: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache
+  namespace: scaling-demo
+  labels:
+    run: php-apache
+spec:
+  ports:
+  - port: 80
+  selector:
+    run: php-apache
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: demo-hpa
+  name: php-apache-hpa
   namespace: scaling-demo
 spec:
   maxReplicas: 10 # define max replica count
@@ -52,7 +47,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: demo
+    name: php-apache
   metrics:
   - type: Resource
     resource:
