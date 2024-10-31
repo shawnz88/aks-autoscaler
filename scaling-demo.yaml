@@ -1,3 +1,4 @@
+---       
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,7 +7,7 @@ metadata:
   name: demo
   namespace: scaling-demo
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: scaling-demo
@@ -34,6 +35,28 @@ spec:
         - containerPort: 80
         resources:
           limits:
-            memory: "128Mi"
+            cpu: 800m
+            memory: 1000Mi
           requests:
-            memory: "64Mi"
+            cpu: 400m
+            memory: 500Mi
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: demo-hpa
+  namespace: scaling-demo
+spec:
+  maxReplicas: 10 # define max replica count
+  minReplicas: 1  # define min replica count
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: demo
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
