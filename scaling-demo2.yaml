@@ -4,6 +4,7 @@ metadata:
   name: php-apache
   namespace: scaling-demo
 spec:
+  replicas: 1
   selector:
     matchLabels:
       run: php-apache
